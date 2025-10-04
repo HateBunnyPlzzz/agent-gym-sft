@@ -34,17 +34,37 @@ def main():
 
     # Load dataset
     print("Loading AgentTraj-L dataset...")
-    try:
-        dataset = load_dataset("AgentGym/AgentTraj-L", split="train")
-        babyai_data = []
-        for item in dataset:
-            if item.get("environment") == "babyai":
-                babyai_data.append(item)
-                if len(babyai_data) >= MAX_SAMPLES:
-                    break
-        print(f"Found {len(babyai_data)} BabyAI samples")
-    except Exception as e:
-        print(f"Failed to load dataset: {e}")
+    babyai_data = []
+
+    # Try to load from local file first
+    import os
+    if os.path.exists("babyai_train.json"):
+        print("Loading from local babyai_train.json...")
+        import json
+        try:
+            with open("babyai_train.json", 'r') as f:
+                data = json.load(f)
+                # Extract first MAX_SAMPLES examples
+                babyai_data = data[:MAX_SAMPLES]
+                print(f"Found {len(babyai_data)} BabyAI samples from local file")
+        except Exception as e:
+            print(f"Failed to load local file: {e}")
+
+    # Fallback to HuggingFace dataset
+    if not babyai_data:
+        try:
+            dataset = load_dataset("AgentGym/AgentTraj-L", split="train")
+            for item in dataset:
+                if item.get("environment") == "babyai":
+                    babyai_data.append(item)
+                    if len(babyai_data) >= MAX_SAMPLES:
+                        break
+            print(f"Found {len(babyai_data)} BabyAI samples from HuggingFace")
+        except Exception as e:
+            print(f"Failed to load dataset: {e}")
+
+    # If still no data, create sample data
+    if not babyai_data:
         print("Creating sample BabyAI data...")
         babyai_data = [
             {
@@ -64,8 +84,21 @@ def main():
                     {"from": "human", "value": "Open the door"},
                     {"from": "gpt", "value": "I need to find the key first, then go to the door and use the key to open it."}
                 ]
+            },
+            {
+                "conversations": [
+                    {"from": "human", "value": "Go to the green box"},
+                    {"from": "gpt", "value": "I'll navigate to the green box by moving in that direction."}
+                ]
+            },
+            {
+                "conversations": [
+                    {"from": "human", "value": "Pick up the yellow ball"},
+                    {"from": "gpt", "value": "I'll pick up the yellow ball by going to its location and grabbing it."}
+                ]
             }
         ]
+        print(f"Created {len(babyai_data)} sample BabyAI examples")
 
     # Format data
     def format_conversation(convs):

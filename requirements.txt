@@ -2,3 +2,4 @@ torch
 transformers
 datasets
 accelerate
+hf_transfer
