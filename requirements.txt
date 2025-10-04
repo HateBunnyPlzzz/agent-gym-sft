@@ -3,3 +3,6 @@ transformers
 datasets
 accelerate
 hf_transfer
+unsloth
+bitsandbytes
+xformers
