@@ -40,14 +40,29 @@ def main():
 
     # Load model
     print("Loading model...")
-    model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME,
-        torch_dtype=torch.float16,
-        device_map="auto"
-    )
+    try:
+        # Try BF16 first (best for modern GPUs), fallback to FP32
+        try:
+            model = AutoModelForCausalLM.from_pretrained(
+                MODEL_NAME,
+                torch_dtype=torch.bfloat16,
+                device_map="auto"
+            )
+            print("✅ Model loaded with BF16 precision")
+        except Exception:
+            print("⚠️ BF16 not supported, falling back to FP32...")
+            model = AutoModelForCausalLM.from_pretrained(
+                MODEL_NAME,
+                torch_dtype=torch.float32,
+                device_map="auto"
+            )
+            print("✅ Model loaded with FP32 precision")
 
-    # Enable gradient checkpointing for memory efficiency
-    model.gradient_checkpointing_enable()
+        model.gradient_checkpointing_enable()
+        print("✅ Model loaded with gradient checkpointing")
+    except Exception as e:
+        print(f"❌ Failed to load model: {e}")
+        return
 
     # Load the prepared dataset
     print("Loading AgentGym dataset...")
@@ -115,6 +130,41 @@ def main():
     train_dataset = AgentGymDataset(train_encodings)
     eval_dataset = AgentGymDataset(eval_encodings)
 
+    # Determine precision based on model dtype and hardware support
+    model_dtype = next(model.parameters()).dtype
+    precision_args = {}
+
+    if model_dtype == torch.bfloat16:
+        try:
+            # Try BF16 but check if hardware supports it
+            precision_args = {"bf16": True}
+            # Test if BF16 is supported by creating a dummy TrainingArguments
+            test_args = TrainingArguments(
+                output_dir="./agentgym-multi-env-output",
+                bf16=True,
+                report_to="none"
+            )
+            print("🎯 Using BF16 precision for training")
+        except ValueError as e:
+            if "bf16/gpu" in str(e):
+                print("⚠️ BF16 not supported by hardware, falling back to FP32...")
+                precision_args = {}
+                # Reload model in FP32
+                model = AutoModelForCausalLM.from_pretrained(
+                    MODEL_NAME,
+                    torch_dtype=torch.float32,
+                    device_map="auto"
+                )
+                model.gradient_checkpointing_enable()
+                print("✅ Model reloaded with FP32 precision")
+            else:
+                raise e
+    elif model_dtype == torch.float16:
+        precision_args = {"fp16": True}
+        print("🎯 Using FP16 precision for training")
+    else:
+        print("🎯 Using FP32 precision for training")
+
     # Training arguments
     training_args = TrainingArguments(
         output_dir="./agentgym-multi-env-output",
@@ -130,7 +180,6 @@ def main():
         eval_strategy="steps",
         save_strategy="steps",
         save_total_limit=2,
-        fp16=True,
         dataloader_pin_memory=False,
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
@@ -138,6 +187,7 @@ def main():
         report_to="none",
         weight_decay=0.01,
         lr_scheduler_type="cosine",
+        **precision_args
     )
 
     # Data collator

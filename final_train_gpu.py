@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Final AgentGym Multi-Environment Training Script
-Supports model selection and configurable training parameters
+GPU-Optimized AgentGym Multi-Environment Training Script
+This version is optimized for cloud GPU training with BF16/FP16 support
 """
 
 import torch
@@ -82,16 +82,16 @@ def main():
                        help='Model name for saving (default: qwen3-0.6b)')
 
     # Training parameters
-    parser.add_argument('--batch-size', type=int, default=2,
-                       help='Batch size per device (default: 2)')
-    parser.add_argument('--gradient-accumulation', type=int, default=4,
-                       help='Gradient accumulation steps (default: 4)')
+    parser.add_argument('--batch-size', type=int, default=4,
+                       help='Batch size per device (default: 4 for GPU)')
+    parser.add_argument('--gradient-accumulation', type=int, default=2,
+                       help='Gradient accumulation steps (default: 2 for GPU)')
     parser.add_argument('--learning-rate', type=float, default=2e-5,
                        help='Learning rate (default: 2e-5)')
     parser.add_argument('--epochs', type=int, default=3,
                        help='Number of training epochs (default: 3)')
-    parser.add_argument('--max-seq-length', type=int, default=1024,
-                       help='Maximum sequence length (default: 1024)')
+    parser.add_argument('--max-seq-length', type=int, default=2048,
+                       help='Maximum sequence length (default: 2048 for GPU)')
     parser.add_argument('--warmup-steps', type=int, default=100,
                        help='Warmup steps (default: 100)')
     parser.add_argument('--save-steps', type=int, default=100,
@@ -107,7 +107,7 @@ def main():
 
     args = parser.parse_args()
 
-    print("🚀 AgentGym Multi-Environment Training")
+    print("🚀 AgentGym Multi-Environment GPU Training")
     print("=" * 50)
     print(f"Model: {args.model}")
     print(f"Model Name: {args.model_name}")
@@ -135,18 +135,30 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # Load model
+    # Load model with GPU optimization
     print("📥 Loading model...")
     try:
-        # Use FP32 for maximum compatibility
-        model = AutoModelForCausalLM.from_pretrained(
-            args.model,
-            torch_dtype=torch.float32,
-            device_map="auto"
-        )
-        print("✅ Model loaded with FP32 precision")
+        # Try BF16 first for modern GPUs
+        try:
+            model = AutoModelForCausalLM.from_pretrained(
+                args.model,
+                torch_dtype=torch.bfloat16,
+                device_map="auto"
+            )
+            precision = "BF16"
+            print("✅ Model loaded with BF16 precision")
+        except Exception:
+            # Fallback to FP16
+            model = AutoModelForCausalLM.from_pretrained(
+                args.model,
+                torch_dtype=torch.float16,
+                device_map="auto"
+            )
+            precision = "FP16"
+            print("✅ Model loaded with FP16 precision")
+
         model.gradient_checkpointing_enable()
-        print("✅ Model loaded with gradient checkpointing")
+        print(f"✅ Model loaded with {precision} precision and gradient checkpointing")
     except Exception as e:
         print(f"❌ Failed to load model: {e}")
         return
@@ -191,11 +203,16 @@ def main():
     train_dataset = AgentGymDataset(train_encodings)
     eval_dataset = AgentGymDataset(eval_encodings)
 
-    # Training arguments
+    # Training arguments with GPU optimization
     output_dir = f"./agentgym-{args.model_name}-output"
 
-    # Use FP32 for maximum compatibility on all hardware
-    print("🎯 Using FP32 precision for training")
+    # Set precision based on model dtype
+    if precision == "BF16":
+        precision_args = {"bf16": True}
+    else:  # FP16
+        precision_args = {"fp16": True}
+
+    print(f"🎯 Using {precision} precision for training")
 
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -211,13 +228,14 @@ def main():
         eval_strategy="steps",
         save_strategy="steps",
         save_total_limit=2,
-        dataloader_pin_memory=False,
+        dataloader_pin_memory=True,  # GPU optimization
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
         report_to="none",
         weight_decay=0.01,
         lr_scheduler_type="cosine",
+        **precision_args
     )
 
     # Data collator
@@ -240,6 +258,7 @@ def main():
     print(f"   Output directory: {output_dir}")
     print(f"   Training on {len(train_dataset)} samples")
     print(f"   Validating on {len(eval_dataset)} samples")
+    print(f"   Precision: {precision}")
 
     # Start training
     trainer.train()
