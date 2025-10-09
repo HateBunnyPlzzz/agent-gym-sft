@@ -11,62 +11,12 @@ load_in_8bit: false
 load_in_4bit: true
 strict: false
 
-# Dataset configuration - Multiple AgentGym environments
+# Dataset configuration - Use AgentGym dataset with conversation format
 datasets:
-  # BabyAI environment
   - path: AgentGym/AgentTraj-L
-    type: conversation
-    ds_type: json
-    conversation_field: conversations
-    roles:
-      user: human
-      assistant: gpt
-    filter_by_environment: babyai
-    name: babyai
-
-  # AlfWorld environment
-  - path: AgentGym/AgentTraj-L
-    type: conversation
-    ds_type: json
-    conversation_field: conversations
-    roles:
-      user: human
-      assistant: gpt
-    filter_by_environment: alfworld
-    name: alfworld
-
-  # WebShop environment
-  - path: AgentGym/AgentTraj-L
-    type: conversation
-    ds_type: json
-    conversation_field: conversations
-    roles:
-      user: human
-      assistant: gpt
-    filter_by_environment: webshop
-    name: webshop
-
-  # SciWorld environment
-  - path: AgentGym/AgentTraj-L
-    type: conversation
-    ds_type: json
-    conversation_field: conversations
-    roles:
-      user: human
-      assistant: gpt
-    filter_by_environment: sciworld
-    name: sciworld
-
-  # TextCraft environment
-  - path: AgentGym/AgentTraj-L
-    type: conversation
-    ds_type: json
-    conversation_field: conversations
-    roles:
-      user: human
-      assistant: gpt
-    filter_by_environment: textcraft
-    name: textcraft
+    type: completion
+    field: text
+    name: agentgym-multi-env
 
 # Validation set size (5% of training data)
 val_set_size: 0.05
