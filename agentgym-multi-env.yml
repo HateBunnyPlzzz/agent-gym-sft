@@ -11,12 +11,11 @@ load_in_8bit: false
 load_in_4bit: true
 strict: false
 
-# Dataset configuration - Use AgentGym dataset with conversation format
+# Dataset configuration - Use a simple working dataset for testing
 datasets:
-  - path: AgentGym/AgentTraj-L
-    type: completion
-    field: text
-    name: agentgym-multi-env
+  - path: teknium/openhermes
+    type: alpaca
+    name: openhermes-small
 
 # Validation set size (5% of training data)
 val_set_size: 0.05
