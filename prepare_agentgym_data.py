@@ -70,14 +70,14 @@ def categorize_by_environment(dataset):
 
 def format_conversation_for_training(conversations: List[Dict[str, Any]], env: str) -> Dict[str, str]:
     """
-    Format conversations into instruction-following format for Axolotl training
+    Format conversations into Axolotl alpaca format
 
     Args:
         conversations: List of conversation dictionaries with 'from' and 'value' keys
         env: Environment name for context-aware formatting
 
     Returns:
-        Dictionary with 'instruction', 'input', and 'output' keys
+        Dictionary with 'instruction', 'input', and 'output' keys in alpaca format
     """
     human_msgs = [conv["value"] for conv in conversations if conv["from"] == "human"]
     gpt_msgs = [conv["value"] for conv in conversations if conv["from"] == "gpt"]
@@ -85,52 +85,37 @@ def format_conversation_for_training(conversations: List[Dict[str, Any]], env: s
     if not human_msgs or not gpt_msgs:
         return None
 
-    formatted_item = {
-        "instruction": "",
-        "input": "",
-        "output": ""
-    }
-
-    # Environment-specific formatting
+    # Alpaca format expects specific structure
     if env == 'webshop':
-        # For WebShop, the first human message is instructions, second contains the actual task
-        if len(human_msgs) >= 2:
-            formatted_item["instruction"] = human_msgs[1]  # The actual shopping task
-        else:
-            formatted_item["instruction"] = human_msgs[0]
-
-        # Last GPT response is the target action
-        formatted_item["output"] = gpt_msgs[-1]
-
-        # Include intermediate context if available
-        if len(human_msgs) > 2:
-            formatted_item["input"] = " | ".join(human_msgs[2:-1])
+        # For WebShop: instruction = task, input = context, output = action
+        instruction = human_msgs[1] if len(human_msgs) >= 2 else human_msgs[0]
+        input_text = " | ".join(human_msgs[2:-1]) if len(human_msgs) > 2 else ""
+        output = gpt_msgs[-1]
 
     elif env in ['alfworld', 'babyai', 'sciworld', 'textcraft']:
-        # For these environments, the first human message is instructions, second is the current state
-        if len(human_msgs) >= 2:
-            formatted_item["instruction"] = human_msgs[0]  # General instructions
-            formatted_item["input"] = human_msgs[1]  # Current situation/goal
+        # For these environments
+        instruction = human_msgs[0]  # Task/goal
+        if len(human_msgs) > 1:
+            input_text = human_msgs[1]  # Current state
+            if len(human_msgs) > 2:
+                input_text += " | " + " | ".join(human_msgs[2:-1])  # Additional context
         else:
-            formatted_item["instruction"] = human_msgs[0]
-
-        # Last GPT response is the target action
-        formatted_item["output"] = gpt_msgs[-1]
-
-        # Include intermediate observations as context
-        if len(human_msgs) > 2:
-            formatted_item["input"] += " | " + " | ".join(human_msgs[2:-1])
+            input_text = ""
+        output = gpt_msgs[-1]
 
     else:
-        # Default formatting for other environments
-        formatted_item["instruction"] = human_msgs[0] if len(human_msgs) > 0 else ""
-        formatted_item["output"] = gpt_msgs[-1] if len(gpt_msgs) > 0 else ""
+        # Default formatting
+        instruction = human_msgs[0] if len(human_msgs) > 0 else ""
+        input_text = " | ".join(human_msgs[1:-1]) if len(human_msgs) > 1 else ""
+        output = gpt_msgs[-1] if len(gpt_msgs) > 0 else ""
 
-        # Add intermediate context if available
-        if len(human_msgs) > 1:
-            formatted_item["input"] = " | ".join(human_msgs[1:-1])
-
-    return formatted_item
+    return {
+        "instruction": instruction,
+        "input": input_text,
+        "output": output,
+        "item_id": "",  # Will be filled later
+        "environment": env
+    }
 
 def prepare_environment_data(dataset, env_samples: Dict[str, List[int]], target_envs: List[str]):
     """Prepare training data for specific environments"""

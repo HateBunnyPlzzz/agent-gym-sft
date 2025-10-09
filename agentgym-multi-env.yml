@@ -17,7 +17,7 @@ strict: false
 
 datasets:
   - path: agentgym_data/multi_env_train.json
-    type: json
+    type: alpaca
     train_split: train
 
 # Validation set size (5% of training data)
