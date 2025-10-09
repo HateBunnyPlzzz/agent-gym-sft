@@ -6,7 +6,7 @@ base_model: Qwen/Qwen3-0.6B
 model_type: AutoModelForCausalLM
 tokenizer_type: AutoTokenizer
 
-# Quantization settings for memory efficiency (disabled for macOS testing)
+# Quantization settings for memory efficiency
 load_in_8bit: false
 load_in_4bit: false
 strict: false
