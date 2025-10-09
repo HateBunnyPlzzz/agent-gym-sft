@@ -127,7 +127,7 @@ def main():
         logging_steps=10,
         save_steps=100,
         eval_steps=100,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         save_strategy="steps",
         save_total_limit=2,
         fp16=True,

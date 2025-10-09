@@ -28,7 +28,7 @@ if [ ! -f "agentgym_data/multi_env_train.json" ]; then
     exit 1
 fi
 
-echo "📊 Dataset ready with $(uv run python -c "import json; print(len(json.load(open('agentgym_data/multi_env_train.json')))" samples) samples"
+echo "📊 Dataset ready with $(uv run python -c 'import json; print(len(json.load(open(\"agentgym_data/multi_env_train.json\")))) samples"
 
 echo "🎯 Starting training..."
 echo "   This will train Qwen3-0.6B on all 5 AgentGym environments simultaneously."
