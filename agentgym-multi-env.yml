@@ -19,6 +19,12 @@ datasets:
   - path: agentgym_data/multi_env_train.json
     type: alpaca
     train_split: train
+    ds_type: json
+    conversation_field: null
+    roles:
+      user: instruction
+      assistant: output
+      system: input
 
 # Validation set size (5% of training data)
 val_set_size: 0.05
