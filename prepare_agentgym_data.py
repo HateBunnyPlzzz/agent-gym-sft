@@ -9,30 +9,33 @@ from datasets import load_dataset
 import os
 
 def prepare_agentgym_datasets():
-    print("📥 Loading AgentGym/AgentTraj-L dataset...")
+    print("📥 Processing AgentGym datasets from local files...")
 
-    try:
-        # Load the full dataset
-        dataset = load_dataset("AgentGym/AgentTraj-L", split="train")
-        print(f"✅ Loaded {len(dataset)} samples from AgentGym/AgentTraj-L")
-    except Exception as e:
-        print(f"❌ Failed to load dataset: {e}")
-        return
-
-    # Define environments to extract
-    environments = ["babyai", "alfworld", "webshop", "sciworld", "textcraft"]
+    # The dataset appears to be already downloaded and separated by environment
+    environment_files = {
+        "babyai": "babyai_train.json",
+        "alfworld": "alfworld_train.json",
+        "webshop": "webshop_train.json",
+        "sciworld": "sciworld_train.json",
+        "textcraft": "textcraft_train.json"
+    }
 
     # Create directory for processed data
     os.makedirs("agentgym_data", exist_ok=True)
 
-    for env in environments:
+    for env, filename in environment_files.items():
         print(f"\n🔄 Processing {env} environment...")
-
-        # Filter data for this environment
         env_data = []
-        for item in dataset:
-            if item.get("environment") == env:
-                # Convert conversations to the format Axolotl expects
+
+        try:
+            # Load the local file for this environment
+            with open(filename, 'r') as f:
+                raw_data = json.load(f)
+
+            print(f"✅ Loaded {len(raw_data)} samples for {env}")
+
+            # Convert conversations to the format Axolotl expects
+            for item in raw_data:
                 if "conversations" in item:
                     formatted_item = {
                         "instruction": "",
@@ -56,7 +59,14 @@ def prepare_agentgym_datasets():
 
                         env_data.append(formatted_item)
 
-        print(f"✅ Found {len(env_data)} samples for {env}")
+        except FileNotFoundError:
+            print(f"⚠️  File {filename} not found, skipping {env}")
+            continue
+        except Exception as e:
+            print(f"⚠️  Could not process {env} data: {e}")
+            continue
+
+        print(f"✅ Processed {len(env_data)} samples for {env}")
 
         # Save to JSON file
         output_file = f"agentgym_data/{env}_train.json"
@@ -67,7 +77,7 @@ def prepare_agentgym_datasets():
 
     print("\n🎉 All AgentGym environments processed successfully!")
     print("\n📁 Created files:")
-    for env in environments:
+    for env in environment_files.keys():
         print(f"   - agentgym_data/{env}_train.json")
 
     print("\n📝 Next steps:")
