@@ -1,0 +1,34 @@
+[project]
+name = "agentgym-gpu-training"
+version = "0.1.0"
+description = "AgentGym GPU Training with Qwen3 models"
+authors = [
+    {name = "AgentGym Team"}
+]
+requires-python = ">=3.9"
+dependencies = [
+    "datasets>=2.14.0",
+    "transformers>=4.36.0",
+    "accelerate>=0.24.0",
+    "wandb>=0.16.0",
+    "torch>=2.0.0",
+    "tokenizers>=0.15.0",
+    "peft>=0.7.0",
+    "scipy>=1.10.0",
+    "numpy>=1.24.0",
+    "axolotl>=0.5.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "isort",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
