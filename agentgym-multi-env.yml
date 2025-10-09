@@ -15,7 +15,7 @@ strict: false
 datasets:
   - path: teknium/openhermes
     type: alpaca
-    name: openhermes-small
+    name: default
 
 # Validation set size (5% of training data)
 val_set_size: 0.05
