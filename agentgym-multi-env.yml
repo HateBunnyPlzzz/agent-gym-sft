@@ -11,11 +11,32 @@ load_in_8bit: false
 load_in_4bit: true
 strict: false
 
-# Dataset configuration - Use a simple working dataset for testing
+# Dataset configuration - AgentGym environments (local files)
 datasets:
-  - path: teknium/openhermes
-    type: alpaca
-    name: default
+  # BabyAI environment
+  - path: agentgym_data/babyai_train.json
+    type: json
+    name: babyai
+
+  # AlfWorld environment
+  - path: agentgym_data/alfworld_train.json
+    type: json
+    name: alfworld
+
+  # WebShop environment
+  - path: agentgym_data/webshop_train.json
+    type: json
+    name: webshop
+
+  # SciWorld environment
+  - path: agentgym_data/sciworld_train.json
+    type: json
+    name: sciworld
+
+  # TextCraft environment
+  - path: agentgym_data/textcraft_train.json
+    type: json
+    name: textcraft
 
 # Validation set size (5% of training data)
 val_set_size: 0.05
