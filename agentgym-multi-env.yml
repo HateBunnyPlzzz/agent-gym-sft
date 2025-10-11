@@ -1,0 +1,107 @@
+# Axolotl configuration for AgentGym multi-environment SFT training
+# Supports: BabyAI, AlfWorld, WebShop, SciWorld, TextCraft
+
+# Base model configuration
+base_model: Qwen/Qwen3-0.6B
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+
+# Quantization settings for memory efficiency
+load_in_8bit: false
+load_in_4bit: false
+strict: false
+
+# Dataset configuration - AgentGym multi-environment dataset
+
+
+
+datasets:
+  - path: agentgym_data/multi_env_train.json
+    type: alpaca
+    train_split: train
+    ds_type: json
+    conversation_field: null
+    roles:
+      user: instruction
+      assistant: output
+      system: input
+
+# Validation set size (5% of training data)
+val_set_size: 0.05
+
+# Output directory
+output_dir: ./agentgym-multi-env-output
+
+# Data preprocessing
+sequence_len: 4096
+sample_packing: true
+eval_sample_packing: true
+pad_to_sequence_len: true
+
+# LoRA configuration (standard LoRA for compatibility)
+adapter: lora
+lora_model_dir:
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_linear: true
+lora_fan_in_fan_out:
+lora_modules_to_save:
+  - embed_tokens
+  - lm_head
+
+# Special tokens configuration
+special_tokens:
+  pad_token: <|end_of_text|>
+
+# Training hyperparameters
+gradient_accumulation_steps: 4
+micro_batch_size: 2
+num_epochs: 3
+optimizer: adamw_torch
+lr_scheduler: cosine
+learning_rate: 2e-5
+
+# Training behavior
+train_on_inputs: false
+group_by_length: false
+
+# Precision settings
+bf16: auto
+fp16:
+tf32: false
+
+# Memory optimization
+gradient_checkpointing: true
+early_stopping_patience:
+resume_from_checkpoint:
+
+# Logging and evaluation
+logging_steps: 10
+evals_per_epoch: 1
+saves_per_epoch: 1
+eval_table_size:
+debug:
+
+# Training steps limits
+max_steps: -1
+warmup_steps: 100
+
+# Weight regularization
+weight_decay: 0.01
+
+# DeepSpeed configuration (optional)
+fsdp:
+fsdp_config:
+
+# Attention mechanisms
+xformers_attention:
+flash_attention: false
+sdp_attention: true
+
+# Wandb integration (optional)
+wandb_project: agentgym-multi-env-sft
+wandb_entity:
+wandb_watch:
+wandb_name: qwen3-0.6b-agentgym-multi-env
+wandb_log_model:
