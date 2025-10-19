@@ -10,14 +10,15 @@ dependencies = [
     "datasets>=2.14.0",
     "transformers>=4.36.0",
     "accelerate>=0.24.0",
-    "wandb>=0.16.0",
     "torch>=2.0.0",
-    "tokenizers>=0.15.0",
     "peft>=0.7.0",
-    "scipy>=1.10.0",
-    "numpy>=1.24.0",
-    "axolotl>=0.5.2",
+    "trl>=0.12.0",
+    "bitsandbytes>=0.44.1",
+    "matplotlib>=3.9.4",
 ]
+
+[tool.setuptools]
+py-modules = ["prepare_agentgym_data"]
 
 [project.optional-dependencies]
 dev = [

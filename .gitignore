@@ -1,0 +1,181 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+images/
+.eggs/
+lib/
+lib64/
+parts/
+qwen*/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Axolotl training outputs
+*-output/
+wandb/
+*.ckpt
+checkpoint*/
+checkpoints/
+logs/
+
+# Dataset files (too large for git)
+datasets/
+agentgym_data/
+*.json
+*.jsonl
+
+# Model files
+*.bin
+*.safetensors
+*.pth
+*.pt
+
+# Temporary files
+*.tmp
+*.temp
+links.txt
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cloud configs
+runpod_config.py
+cloud_config/
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
+training.log
+
+# HuggingFace cache
+~/.cache/huggingface/
+.cache/
+
+# UV
+.uv/
+
+# Documentation and research files
+*.pdf
+*.md
+!README.md
+!CLAUDE.md
+
+# Large datasets (keep local)
+agentgym_balanced_*.json
+agentgym_trl_data.json
+
+# Training outputs and models
+qwen*/
