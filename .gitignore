@@ -123,11 +123,16 @@ checkpoint*/
 checkpoints/
 logs/
 
-# Dataset files (too large for git)
+# Dataset files (too large for git - keep essential ones)
 datasets/
 agentgym_data/
+# Block large dataset files but allow essential ones
+agentgym_trl_data*.json
+agentgym_balanced_*.json
+!agentgym_balanced_2992_per_env.json
+agentgym-*.json
 *.json
-*.jsonl
+!agentgym_balanced_2992_per_env.json
 
 # Model files
 *.bin
