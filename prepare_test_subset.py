@@ -31,6 +31,11 @@ def download_and_create_subset():
 
     subset_data = [dataset['train'][i] for i in indices]
 
+    # Debug: Check structure of first item
+    if subset_data:
+        print(f"🔍 Debug: First item keys: {list(subset_data[0].keys())}")
+        print(f"🔍 Debug: First item: {json.dumps(subset_data[0], indent=2)[:300]}...")
+
     # Analyze environment distribution
     env_counts = {}
     for item in subset_data:
@@ -92,11 +97,11 @@ def download_and_create_subset():
     if axolotl_data:
         print(f"\n📝 Sample structure:")
         print(f"   Environment: {axolotl_data[0].get('environment', 'unknown')}")
-        print(f"   Conversations: {len(axolotl_data[0]['conversations'])} turns")
+        print(f"   Messages: {len(axolotl_data[0]['messages'])} turns")
 
-        first_conv = axolotl_data[0]['conversations'][0]
-        print(f"   First message type: {first_conv.get('from', 'unknown')}")
-        print(f"   Content preview: {first_conv.get('value', '')[:100]}...")
+        first_msg = axolotl_data[0]['messages'][0]
+        print(f"   First message type: {first_msg.get('role', 'unknown')}")
+        print(f"   Content preview: {first_msg.get('content', '')[:100]}...")
 
     return output_file
 

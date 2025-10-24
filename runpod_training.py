@@ -51,7 +51,7 @@ def setup_environment():
     commands = [
         ("pip install --upgrade pip setuptools wheel ninja", "Upgrading pip and tools"),
         ("pip install datasets accelerate transformers", "Installing core dependencies"),
-        ("pip install --no-build-isolation axolotl[flash-attn,deepspeed]", "Installing Axolotl with PyPI"),
+        ("pip install --no-build-isolation axolotl[deepspeed]", "Installing Axolotl with PyPI (no flash-attn)"),
     ]
 
     for cmd, desc in commands:

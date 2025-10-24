@@ -49,10 +49,11 @@ optimizer: adamw_torch
 weight_decay: 0.01
 max_grad_norm: 1.0
 
-# Memory optimization for RTX 4000ADA
+# Memory optimization for RTX 4000ADA (no flash-attn)
 gradient_checkpointing: true
 bf16: true
 tf32: true
+flash_attention: false
 
 # Minimal logging for smoke test
 eval_steps: 999999  # Skip evaluation for smoke test
