@@ -37,8 +37,8 @@ lr_scheduler: cosine
 num_epochs: 1  # Conservative for large model
 warmup_steps: 50
 
-# Batch configuration for 20GB VRAM (extremely conservative)
-batch_size: 1
+# Batch configuration for 20GB VRAM (gradient accumulation only)
+# batch_size: 1  # Use only one: batch_size OR gradient_accumulation_steps
 micro_batch_size: 1
 gradient_accumulation_steps: 64  # Large effective batch size
 
