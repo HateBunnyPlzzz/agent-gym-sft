@@ -8,17 +8,13 @@ model_type: AutoModelForCausalLM
 # Dataset configuration
 datasets:
   - path: agentgym_test_subset.jsonl
-    type: conversation
-    ds_type: jsonl
-    conversation_style: chatml
-    field_messages: messages
+    type: chat_template
+    field_messages: conversations
     message_property_mappings:
       role: role
       content: content
-    roles:
-      user: user
-      assistant: assistant
-      system: system
+    chat_template: chatml
+    add_generation_prompt: true
 
 # Training parameters for quick smoke test
 sequence_len: 4096
