@@ -1,0 +1,95 @@
+# Axolotl Configuration for Qwen3-0.6B SFT on AgentGym
+# Optimized for RTX 4000ADA 20GB VRAM - 10-15 minute smoke test
+
+# Base model
+base_model: Qwen/Qwen3-0.6B
+model_type: AutoModelForCausalLM
+
+# Dataset configuration
+dataset: agentgym_test_subset.jsonl
+dataset_format: conversation
+conversation_style: chatml
+field_messages: messages
+message_property_mappings:
+  role: role
+  content: content
+roles:
+  user: user
+  assistant: assistant
+  system: system
+
+# Training parameters for quick smoke test
+sequence_len: 4096
+sample_packing: true
+pad_to_sequence_len: true
+
+# LoRA configuration (memory efficient)
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+# Fast training hyperparameters for smoke test
+learning_rate: 1e-4
+lr_scheduler: constant
+num_epochs: 1
+batch_size: 2
+gradient_accumulation_steps: 8
+micro_batch_size: 1
+
+# Optimization
+optimizer: adamw_torch
+weight_decay: 0.01
+max_grad_norm: 1.0
+
+# Memory optimization for RTX 4000ADA
+gradient_checkpointing: true
+bf16: true
+tf32: true
+
+# Minimal logging for smoke test
+eval_steps: 999999  # Skip evaluation for smoke test
+save_steps: 50
+logging_steps: 5
+output_dir: ./qwen3-agentgym-smoke-test
+checkpoint: false
+
+# Tokenizer setup
+tokenizer: Qwen/Qwen3-0.6B
+special_tokens:
+  pad_token: "<|finetune_right_pad_id|>"
+  eos_token: "<|im_end|>"
+  bos_token: "<|im_start|>"
+
+# No validation for smoke test - train on all data
+val_set_size: 0
+
+# Single GPU setup
+distributed_backend: local
+ddp: false
+
+# Disable wandb for simplicity
+wandb_project: null
+wandb_run_name: null
+
+# Hardware optimization
+gpu_memory_limit: 20GB
+max_memory_per_gpu: 20GB
+
+# Data loading
+num_proc: 2
+dataloader_num_workers: 2
+
+# Reproducibility
+seed: 42
+
+# Chat template
+chat_template: chatml
+add_generation_prompt: true
