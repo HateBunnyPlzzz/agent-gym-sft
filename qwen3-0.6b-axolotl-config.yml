@@ -34,12 +34,14 @@ lora_target_modules:
   - up_proj
   - down_proj
 
-# Fast training hyperparameters for smoke test
+# Fast training hyperparameters (CHOOSE ONE method)
 learning_rate: 1e-4
 lr_scheduler: constant
 num_epochs: 1
+# Option 1: Simple batch size (use this for smoke test)
 batch_size: 2
-gradient_accumulation_steps: 8
+# Option 2: Gradient accumulation (uncomment if you want larger effective batch)
+# gradient_accumulation_steps: 8
 micro_batch_size: 1
 
 # Optimization
@@ -47,15 +49,14 @@ optimizer: adamw_torch
 weight_decay: 0.01
 max_grad_norm: 1.0
 
-# Memory optimization for RTX 4000ADA (no flash-attn)
+# Memory optimization for RTX 4000ADA
 gradient_checkpointing: true
 bf16: true
 tf32: true
 flash_attention: false
 
 # Minimal logging for smoke test
-eval_steps: 25  # Small number for occasional check
-eval_sample_packing: false
+eval_steps: 25
 save_steps: 50
 logging_steps: 5
 output_dir: ./qwen3-agentgym-smoke-test
@@ -63,32 +64,14 @@ checkpoint: false
 
 # Tokenizer setup
 tokenizer: Qwen/Qwen3-0.6B
-special_tokens:
-  pad_token: "<|finetune_right_pad_id|>"
-  eos_token: "<|im_end|>"
-  bos_token: "<|im_start|>"
-
-# No validation for smoke test - train on all data
 
 # Single GPU setup
 distributed_backend: local
 ddp: false
 
-# Disable wandb for simplicity
-wandb_project: null
-wandb_run_name: null
-
-# Hardware optimization
-gpu_memory_limit: 20GB
-max_memory_per_gpu: 20GB
-
-# Data loading
-num_proc: 2
-dataloader_num_workers: 2
+# Data loading (minimal)
+num_proc: 1
+dataloader_num_workers: 1
 
 # Reproducibility
 seed: 42
-
-# Chat template
-chat_template: chatml
-add_generation_prompt: true
