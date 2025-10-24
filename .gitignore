@@ -9,6 +9,8 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+agentgym_test_subset.jsonl
+last-prepared-run/
 images/
 .eggs/
 lib/
