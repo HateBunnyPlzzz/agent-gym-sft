@@ -6,17 +6,19 @@ base_model: Qwen/Qwen3-0.6B
 model_type: AutoModelForCausalLM
 
 # Dataset configuration
-dataset: agentgym_test_subset.jsonl
-dataset_format: conversation
-conversation_style: chatml
-field_messages: messages
-message_property_mappings:
-  role: role
-  content: content
-roles:
-  user: user
-  assistant: assistant
-  system: system
+datasets:
+  - path: agentgym_test_subset.jsonl
+    type: conversation
+    ds_type: jsonl
+    conversation_style: chatml
+    field_messages: messages
+    message_property_mappings:
+      role: role
+      content: content
+    roles:
+      user: user
+      assistant: assistant
+      system: system
 
 # Training parameters for quick smoke test
 sequence_len: 4096
