@@ -54,7 +54,8 @@ tf32: true
 flash_attention: false
 
 # Minimal logging for smoke test
-eval_steps: 999999  # Skip evaluation for smoke test
+eval_steps: 25  # Small number for occasional check
+eval_sample_packing: false
 save_steps: 50
 logging_steps: 5
 output_dir: ./qwen3-agentgym-smoke-test
@@ -68,7 +69,6 @@ special_tokens:
   bos_token: "<|im_start|>"
 
 # No validation for smoke test - train on all data
-val_set_size: 0
 
 # Single GPU setup
 distributed_backend: local
