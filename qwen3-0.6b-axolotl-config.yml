@@ -16,9 +16,9 @@ datasets:
       role: role
       content: content
     roles:
-      - user
-      - assistant
-      - system
+      user: user
+      assistant: assistant
+      system: system
 
 # Training parameters for quick smoke test
 sequence_len: 4096
