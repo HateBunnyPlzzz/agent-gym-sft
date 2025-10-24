@@ -1,0 +1,85 @@
+# Axolotl Configuration for GPT-OSS-20B SFT on AgentGym
+# Optimized for RTX 4000ADA 20GB VRAM (budget option) with 20,000 samples
+
+# Base model
+base_model: openai/gpt-oss-20b
+model_type: AutoModelForCausalLM
+
+# Dataset configuration
+datasets:
+  - path: agentgym_medium_20b_subset.jsonl
+    type: chat_template
+    field_messages: messages
+    chat_template: tokenizer_default  # Uses harmony response format
+    add_generation_prompt: true
+
+# Training parameters for 20B model (very conservative for 20GB VRAM)
+sequence_len: 4096
+sample_packing: false
+pad_to_sequence_len: true
+
+# LoRA configuration (conservative for large model on budget GPU)
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.1
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+# Training hyperparameters (very conservative for 20B)
+learning_rate: 3e-5
+lr_scheduler: cosine
+num_epochs: 1  # Conservative for large model
+warmup_steps: 50
+
+# Batch configuration for 20GB VRAM (extremely conservative)
+batch_size: 1
+micro_batch_size: 1
+gradient_accumulation_steps: 64  # Large effective batch size
+
+# Optimization
+optimizer: adamw_torch
+weight_decay: 0.01
+max_grad_norm: 0.5  # More conservative for large model
+
+# Memory optimization for budget GPU
+gradient_checkpointing: true
+bf16: true
+tf32: true
+flash_attention: false
+ddp: false
+
+# Evaluation and saving (less frequent to save memory)
+eval_steps: 200
+save_steps: 400
+logging_steps: 20
+output_dir: ./gpt-oss-20b-agentgym
+save_only_model: false
+save_safetensors: true
+
+# Tokenizer setup
+tokenizer: openai/gpt-oss-20b
+
+# Single GPU setup
+distributed_backend: local
+ddp: false
+
+# Data loading (minimal to save memory)
+num_proc: 2
+dataloader_num_workers: 1
+
+# Reproducibility
+seed: 42
+
+# Additional settings
+train_on_inputs: false
+group_by_length: false
+eval_sample_packing: false
+
+# Memory optimization settings
+deepspeed: null  # Disabled for budget GPU compatibility

@@ -1,0 +1,82 @@
+# Axolotl Configuration for Qwen3-8B SFT on AgentGym
+# Optimized for RTX 4000ADA 20GB VRAM (budget option) with 10,000 samples
+
+# Base model
+base_model: Qwen/Qwen3-8B
+model_type: AutoModelForCausalLM
+
+# Dataset configuration
+datasets:
+  - path: agentgym_medium_8b_subset.jsonl
+    type: chat_template
+    field_messages: messages
+    chat_template: chatml
+    add_generation_prompt: true
+
+# Training parameters for 8B model (conservative for 20GB VRAM)
+sequence_len: 4096
+sample_packing: false
+pad_to_sequence_len: true
+
+# LoRA configuration (memory efficient for budget GPU)
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+# Training hyperparameters (conservative)
+learning_rate: 5e-5
+lr_scheduler: cosine
+num_epochs: 2
+warmup_steps: 100
+
+# Batch configuration for 20GB VRAM (very conservative)
+batch_size: 1
+micro_batch_size: 1
+gradient_accumulation_steps: 32
+
+# Optimization
+optimizer: adamw_torch
+weight_decay: 0.01
+max_grad_norm: 1.0
+
+# Memory optimization for budget GPU
+gradient_checkpointing: true
+bf16: true
+tf32: true
+flash_attention: false
+ddp: false
+
+# Evaluation and saving (frequent saves for debugging)
+eval_steps: 100
+save_steps: 200
+logging_steps: 10
+output_dir: ./qwen3-8b-agentgym
+save_only_model: false
+save_safetensors: true
+
+# Tokenizer setup
+tokenizer: Qwen/Qwen3-8B
+
+# Single GPU setup
+distributed_backend: local
+ddp: false
+
+# Data loading (minimal to save memory)
+num_proc: 4
+dataloader_num_workers: 2
+
+# Reproducibility
+seed: 42
+
+# Additional settings
+train_on_inputs: false
+group_by_length: false
+eval_sample_packing: false
