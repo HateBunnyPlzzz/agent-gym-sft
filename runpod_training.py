@@ -9,17 +9,38 @@ import sys
 import os
 from pathlib import Path
 
-def run_command(cmd, description):
-    """Run command with error handling"""
+def run_command(cmd, description, show_output=True):
+    """Run command with live output and better logging"""
     print(f"🔄 {description}...")
+    print(f"📝 Running: {cmd}")
+    print("-" * 50)
+
     try:
-        result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
-        print(f"✅ {description} completed")
-        return result.stdout
-    except subprocess.CalledProcessError as e:
+        if show_output:
+            # Show live output
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT, universal_newlines=True,
+                                     bufsize=1)
+
+            # Stream output line by line
+            for line in iter(process.stdout.readline, ''):
+                print(line.rstrip())
+
+            process.wait()
+
+            if process.returncode == 0:
+                print("-" * 50)
+                print(f"✅ {description} completed successfully")
+            else:
+                print(f"❌ {description} failed with code {process.returncode}")
+                sys.exit(1)
+        else:
+            # Silent execution for quick commands
+            result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
+            print(f"✅ {description} completed")
+
+    except Exception as e:
         print(f"❌ Error in {description}: {e}")
-        print(f"   stdout: {e.stdout}")
-        print(f"   stderr: {e.stderr}")
         sys.exit(1)
 
 def setup_environment():
