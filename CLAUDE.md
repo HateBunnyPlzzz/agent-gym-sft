@@ -1,13 +1,13 @@
 # AgentGym Development Context
 
-**Current Development Status**: SFT training on AgentGym environments using local RTX 4090, targeting Qwen3-0.6B model. Framework decision: TRL recommended for better modularity.
+**Current Development Status**: Moving to GRPO implementation. Dataset creation pipeline completed with 100 samples, SFT training already completed. Next phase: building and testing online RL pipeline with GRPO.
 
 ## 🎯 Primary Objectives
 
-1. **SFT Training**: Supervised fine-tuning on AgentGym trajectory datasets
-2. **Online Learning**: GRPO implementation for environment-based RL
+1. ✅ **SFT Training**: COMPLETED - Supervised fine-tuning on AgentGym trajectory datasets
+2. **Online Learning**: GRPO implementation for environment-based RL (CURRENT PHASE)
 3. **Clean Implementation**: Lean codebase without unnecessary files
-4. **Multi-Environment Progression**: SFT → GRPO across BabyAI, AlfWorld, WebShop, SciWorld, TextCraft
+4. **Multi-Environment Progression**: GRPO across BabyAI, AlfWorld, WebShop, SciWorld, TextCraft
 
 ## 🔧 Qwen3-4B Best Practices (Alibaba Official)
 
@@ -51,6 +51,27 @@ text = tokenizer.apply_chat_template(
 - **Repetition Control**: Set `presence_penalty=1.5` during generation
 
 ## 📝 Latest Discussion Summary
+
+### GRPO Implementation Phase Started (2025-10-30)
+
+**Current Status**: SFT training completed, moving to GRPO online learning implementation
+
+**Completed Milestones**:
+- ✅ Dataset creation pipeline (100 samples)
+- ✅ SFT training on AgentGym trajectories
+- ✅ TRL framework selected and validated
+- ✅ GRPO algorithm understanding clarified
+
+**Key GRPO Insights**:
+- GRPO generates multiple responses per prompt during training (typically 4-16)
+- Cannot use static offline datasets with single scored responses
+- Requires online reward scoring from environment functions
+- Uses relative advantages: `A_i = (r_i - mean(r)) / std(r)`
+
+**Implementation Strategy**:
+1. **Phase 1**: Test GRPO pipeline with random rewards
+2. **Phase 2**: Integrate AgentGym environment servers for genuine rewards
+3. **Phase 3**: Scale to multiple environments (BabyAI, AlfWorld, WebShop, SciWorld, TextCraft)
 
 ### Framework Decision: TRL vs Axolotl (2025-10-16)
 
@@ -195,29 +216,29 @@ curl -X POST http://127.0.0.1:8081/rollouts \
 - **Secondary**: Environment setup for GRPO Phase 2
 - **Tertiary**: GRPO implementation with TRL GRPOTrainer
 
-## 🚦 Next Immediate Actions (SFT FOCUSED)
+## 🚦 Next Immediate Actions (GRPO FOCUSED)
 
-### Immediate SFT Implementation Plan
+### Immediate GRPO Implementation Plan
 
-1. **Install TRL dependencies**: `uv pip install trl peft bitsandbytes datasets accelerate`
-2. **Create TRL data converter**: Transform AgentGym JSON to TRL conversation format
-3. **Write Qwen3-4B SFT script**: TRL SFTTrainer with optimized LoRA config
-4. **Start SFT training**: Train Qwen3-4B on AgentGym datasets with RTX 4090
-5. **Validate overfitting**: Test model performance on training data per environment
-6. **Benchmark performance**: Evaluate on each of the 5 AgentGym environments
+1. **Set up GRPO environment**: `uv pip install trl peft bitsandbytes datasets accelerate vllm`
+2. **Create GRPO test script**: Implement GRPOTrainer with random reward function
+3. **Test pipeline validation**: Verify multiple generations per prompt work correctly
+4. **Implement environment reward function**: Connect to AgentGym environment servers
+5. **Start GRPO training**: Use SFT model as base for online learning
+6. **Scale to multi-environment**: Progress through BabyAI → AlfWorld → WebShop → SciWorld → TextCraft
 
-### SFT Training Configuration
+### GRPO Training Configuration
 ```python
-# Target SFT setup for Qwen3-4B
-model_name = "Qwen/Qwen3-4B"
+# Target GRPO setup for online learning
+model_name = "path/to/your/sft/model"  # Use completed SFT model
 training_config = {
-    "lora_rank": 32,
-    "lora_alpha": 64,
-    "learning_rate": 1e-4,
-    "batch_size": 4,
-    "gradient_accumulation_steps": 4,
-    "num_epochs": 3,
-    "max_seq_length": 32768
+    "num_generations": 8,  # Generate 8 responses per prompt
+    "per_device_train_batch_size": 4,
+    "max_completion_length": 1024,
+    "learning_rate": 1e-5,
+    "beta": 0.05,  # KL regularization coefficient
+    "temperature": 0.9,
+    "top_k": 50
 }
 ```
 
@@ -243,7 +264,7 @@ training_config = {
 
 ---
 
-**Last Updated**: 2025-10-16
-**Status**: Model upgraded to Qwen3-4B, TRL framework chosen, datasets downloaded, ready for SFT implementation
-**Hardware**: RTX 4090 (24GB VRAM) available locally - perfect fit for Qwen3-4B
-**Focus**: SFT training only - GRPO will be considered after SFT completion
+**Last Updated**: 2025-10-30
+**Status**: Dataset creation completed, SFT training completed, ready for GRPO implementation
+**Hardware**: RTX 4090 (24GB VRAM) available locally - perfect fit for GRPO training
+**Focus**: GRPO online learning with environment integration - building RL pipeline
