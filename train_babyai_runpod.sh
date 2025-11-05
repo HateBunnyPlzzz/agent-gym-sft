@@ -144,7 +144,7 @@ python3 -m verl.agent_trainer.main_ppo \
     algorithm.adv_estimator=grpo \
     algorithm.rounds_ctrl.type=fixed \
     algorithm.rounds_ctrl.rounds=20 \
-    data.train_file=AgentItemId/${task_name}_train.json \
+    data.train_file=data/AgentGym-RL-Data-ID/train/${task_name}_train.json \
     data.train_batch_size=${train_batch_size} \
     data.max_prompt_length=1024 \
     data.max_response_length=4096 \
