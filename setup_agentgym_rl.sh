@@ -22,6 +22,11 @@ else
     echo "✅ Conda already available"
 fi
 
+# Accept conda Terms of Service
+echo "📋 Accepting conda Terms of Service..."
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
 # Create and activate agentgym-rl environment
 echo "🏗️ Creating conda environment..."
 conda create -n agentgym-rl python==3.10 -y
