@@ -110,7 +110,7 @@ print_header "Step 5: RL Training Environment"
 
 # Create virtual environment
 echo "🐍 Creating Python 3.10 virtual environment..."
-uv venv python=3.10 --name rl-training
+uv venv python=3.10
 source .venv/bin/activate
 print_status "Virtual environment created and activated"
 
@@ -152,7 +152,7 @@ print_header "Step 6: AgentGym Environments"
 
 # Create separate environment for environments
 echo "🐍 Creating environment for AgentGym environments..."
-uv venv python=3.10 --name agentgym-envs
+uv venv python=3.10
 source .venv/bin/activate
 
 # Install PyTorch for environments
