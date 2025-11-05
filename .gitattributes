@@ -1,0 +1,13 @@
+# Set default line ending behavior
+* text=auto eol=lf
+
+# Force Unix line endings for shell scripts
+*.sh text eol=lf
+
+# Keep binary files as-is
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pkl binary
+*.bin binary
