@@ -22,6 +22,11 @@ else
     echo "✅ Conda already available"
 fi
 
+# Export conda to PATH if not already
+if ! echo $PATH | grep -q "miniconda/bin"; then
+    export PATH="$HOME/miniconda/bin:$PATH"
+fi
+
 # Accept conda Terms of Service
 echo "📋 Accepting conda Terms of Service..."
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
