@@ -76,6 +76,10 @@ export VLLM_USE_MODELSCOPE=0
 export VLLM_WORKER_MULTIPROC_METHOD=spawn
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
+# Disable Ray warnings
+export RAY_DISABLE_DOCKER_CPU_WARNING=1
+export RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+
 # Training command
 HYDRA_FULL_ERROR=1 \
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
@@ -110,7 +114,8 @@ python3 -m verl.agent_trainer.main_ppo \
     trainer.project_name=agentgym-rl-babyai \
     trainer.experiment_name=$EXP_NAME \
     trainer.save_freq=100 \
-    trainer.total_epochs=$TOTAL_EPOCHS
+    trainer.total_epochs=$TOTAL_EPOCHS \
+    trainer.n_gpus_per_node=1
 
 TRAINING_STATUS=$?
 
