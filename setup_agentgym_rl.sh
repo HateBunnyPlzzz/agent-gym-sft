@@ -9,7 +9,7 @@ echo "🚀 Setting up AgentGym-RL on RunPod A40"
 echo "====================================="
 
 # Install conda
-if ! command -v conda &> /dev/null; then
+if [ ! -d "/root/miniconda" ]; then
     echo "📦 Installing conda..."
     cd /root
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -20,6 +20,10 @@ if ! command -v conda &> /dev/null; then
     echo "✅ Conda installed"
 else
     echo "✅ Conda already available"
+    # Update existing installation
+    cd /root
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    bash miniconda.sh -u -p $HOME/miniconda
 fi
 
 # Export conda to PATH if not already
