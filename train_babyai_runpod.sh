@@ -82,11 +82,10 @@ echo ""
 echo "🤖 Starting BabyAI environment server..."
 
 # Start BabyAI environment server in background
-cd "$AGENTENV_DIR"
+cd /root/agent-gym-sft/AgentGym-RL/AgentGym/agentenv-babyai
 source "$WORK_DIR/agentenvs/bin/activate"
 
 # Start the environment server
-cd /root/agent-gym-sft/AgentGym-RL/AgentGym/agentenv-babyai
 python -m agentenv_babyai.launch --host 0.0.0.0 --port 36005 > "$model_save_path/env_server.log" 2>&1 &
 ENV_SERVER_PID=$!
 
