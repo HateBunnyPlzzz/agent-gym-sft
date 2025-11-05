@@ -40,10 +40,11 @@ wget -q $FLASH_ATTENTION_URL -O $FLASH_ATTENTION_NAME
 pip3 install $FLASH_ATTENTION_NAME || echo "⚠️ Flash attention install failed - continuing without it"
 rm -f $FLASH_ATTENTION_NAME
 
-# Clone AgentGym-RL
-echo "📥 Cloning AgentGym-RL..."
+# Clone your repository and AgentGym-RL
+echo "📥 Cloning repositories..."
 cd /root
-rm -rf AgentGym-RL
+rm -rf agent-gym-sft AgentGym-RL
+git clone --branch dev-0 https://github.com/HateBunnyPlzzz/agent-gym-sft.git
 git clone --recursive https://github.com/WooooDyy/AgentGym-RL
 cd AgentGym-RL
 
@@ -71,7 +72,8 @@ echo "✅ Setup complete!"
 echo "=================="
 echo "Next steps:"
 echo "1. Activate environment: conda activate agentgym-rl"
-echo "2. Start BabyAI server: cd /root/AgentGym-RL/AgentGym/agentenv-babyai && babyai --host 0.0.0.0 --port 36005"
-echo "3. Run training: bash train_babyai_a40.sh"
+echo "2. Copy training script: cp /root/agent-gym-sft/train_babyai_a40.sh /root/AgentGym-RL/"
+echo "3. Start BabyAI server: cd /root/AgentGym-RL/AgentGym/agentenv-babyai && babyai --host 0.0.0.0 --port 36005"
+echo "4. Run training: cd /root/AgentGym-RL && bash train_babyai_a40.sh"
 echo ""
 echo "Environment activated. Ready to start training!"
