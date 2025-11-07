@@ -10,32 +10,34 @@ echo "================================"
 
 # Configuration
 TASK_NAME="babyai"
-EXP_NAME="babyai_a40_run"
+EXP_NAME="babyai_2xa40_run"
 ENV_SERVER_URL="http://127.0.0.1:36005"
 DATASET_PATH="/root/.cache/huggingface/hub/datasets--AgentGym--AgentGym-RL-Data-ID/snapshots/99d0b7923bf126d9c6cdea5f362d2d41ccb5d493/train/babyai_train.json"
 
-# Training parameters (optimized for A40 24GB VRAM)
+# Training parameters (optimized for 2x A40 96GB VRAM total)
 KL_COEF=0.001
-POLICY_LEARNING_RATE=1e-6
-ROLLOUT_SAMPLE_NUM=2
-TRAIN_BATCH_SIZE=4
-PPO_MINI_BATCH_SIZE=2
-PPO_MICRO_BATCH_SIZE_PER_GPU=1
+POLICY_LEARNING_RATE=2e-6          # Slightly higher LR for faster convergence with more compute
+ROLLOUT_SAMPLE_NUM=8              # Increased rollouts per sample
+TRAIN_BATCH_SIZE=16               # Increased batch size for 2x GPUs
+PPO_MINI_BATCH_SIZE=8             # Increased for better gradient estimation
+PPO_MICRO_BATCH_SIZE_PER_GPU=2    # Better GPU utilization
 PPO_INNER_EPOCHS=1
-TOTAL_EPOCHS=5
+TOTAL_EPOCHS=8                    # More epochs with better hardware
 
 # Model configuration
 MODEL_PATH="Qwen/Qwen2.5-7B-Instruct"
 
 # Output configuration
-MODEL_SAVE_DIR="saves/babyai_a40"
+MODEL_SAVE_DIR="saves/babyai_2xa40"
 mkdir -p "$MODEL_SAVE_DIR"
 
 echo "Configuration:"
 echo "- Task: $TASK_NAME"
 echo "- Model: $MODEL_PATH"
+echo "- GPUs: 2x A40 (96GB VRAM total)"
 echo "- Batch Size: $TRAIN_BATCH_SIZE"
 echo "- Learning Rate: $POLICY_LEARNING_RATE"
+echo "- Rollout Samples: $ROLLOUT_SAMPLE_NUM"
 echo "- Epochs: $TOTAL_EPOCHS"
 echo "- Environment Server: $ENV_SERVER_URL"
 echo ""
@@ -99,11 +101,12 @@ python3 -m verl.agent_trainer.main_ppo \
     actor_rollout_ref.actor.use_kl_loss=True \
     actor_rollout_ref.actor.kl_loss_coef=$KL_COEF \
     actor_rollout_ref.actor.kl_loss_type=low_var_kl \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.5 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.rollout.n=$ROLLOUT_SAMPLE_NUM \
-    actor_rollout_ref.rollout.max_model_len=8192 \
-    actor_rollout_ref.rollout.max_tokens=200 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+    actor_rollout_ref.rollout.max_model_len=16384 \
+    actor_rollout_ref.rollout.max_tokens=400 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
+    actor_rollout_ref.rollout.dtype=float16 \
     actor_rollout_ref.actor.ppo_epochs=$PPO_INNER_EPOCHS \
     actor_rollout_ref.actor.optim.lr=$POLICY_LEARNING_RATE \
     actor_rollout_ref.actor.ppo_mini_batch_size=$PPO_MINI_BATCH_SIZE \
@@ -113,9 +116,9 @@ python3 -m verl.agent_trainer.main_ppo \
     trainer.default_local_dir="$MODEL_SAVE_DIR" \
     trainer.project_name=agentgym-rl-babyai \
     trainer.experiment_name=$EXP_NAME \
-    trainer.save_freq=100 \
+    trainer.save_freq=50 \
     trainer.total_epochs=$TOTAL_EPOCHS \
-    trainer.n_gpus_per_node=1
+    trainer.n_gpus_per_node=2
 
 TRAINING_STATUS=$?
 
