@@ -62,6 +62,10 @@ cd "$AGENTGYM_RL_DIR"
 echo "🔧 Activating RL training environment..."
 source "$WORK_DIR/python=3.10/bin/activate"
 
+# Install BabyAI-specific dependencies
+echo "📦 Installing BabyAI environment dependencies..."
+pip install gym gymnasium matplotlib pillow fastapi uvicorn pydantic
+
 # Verify VERL installation and GPU memory
 echo "🔍 Verifying setup..."
 python -c "

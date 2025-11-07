@@ -7,9 +7,13 @@ vllm-venv/
 
 # External codebases (DO NOT TRACK)
 AgentGym/
+AgentGym-RL/
 lmrlgym/
+outputs/
 agentenv/
-
+data/
+start_env_server.py
+.obsidian
 # Python cache and build files
 __pycache__/
 *.py[cod]
